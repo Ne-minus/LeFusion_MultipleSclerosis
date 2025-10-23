@@ -8,10 +8,20 @@ from omegaconf import DictConfig
 from get_dataset.get_dataset import get_train_dataset
 import torch
 from ddpm.unet import UNet
+import wandb
 import torch.nn as nn
+
+wandb.login(key="836565444e4f3196b5260e3b7390109293608a95")
 
 @hydra.main(config_path='config', config_name='base_cfg', version_base=None)
 def run(cfg: DictConfig):
+
+    wandb.init(
+        project=cfg.model.get("wandb_project", "ddpm-training"),
+        name=cfg.model.get("wandb_run_name", None),
+        config=cfg,
+        mode="online")
+
     torch.cuda.set_device(cfg.model.gpus)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     if cfg.model.denoising_fn == 'Unet3D':
@@ -58,7 +68,10 @@ def run(cfg: DictConfig):
     )
     if cfg.model.load_milestone:
         trainer.load(cfg.model.load_milestone)
+
     trainer.train()
+
+    wandb.finish()
 
 if __name__ == '__main__':
     run()

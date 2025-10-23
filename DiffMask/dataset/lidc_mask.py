@@ -9,6 +9,9 @@ import torchio as tio
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from skimage import measure
+from skimage.measure import label, regionprops
+import nibabel as nib
+
 
 PREPROCESSING_TRANSFORMS = tio.Compose([
     tio.Clamp(out_min=-1000, out_max=400),
@@ -42,7 +45,7 @@ class LIDCMASKDataset(Dataset):
         return image, label
 
     def get_file_names(self):
-        all_file_names = glob.glob(os.path.join(self.root_dir, './**/*.nii.gz'), recursive=True)
+        all_file_names = glob.glob(os.path.join(self.root_dir, './*.nii.gz'), recursive=True)
         test_file_names = set()
 
         with open(self.remove_test_path, 'r') as file:
@@ -54,6 +57,11 @@ class LIDCMASKDataset(Dataset):
             f for f in all_file_names
             if os.path.basename(f)[:-7] not in test_file_names
         ]
+        for f in all_file_names:
+            print(os.path.basename(f)[:-7])
+            break
+
+        print("FILTERED: ", len(filtered_file_names))
         return filtered_file_names
 
     def __len__(self):
@@ -75,21 +83,32 @@ class LIDCMASKDataset(Dataset):
         p = np.random.choice([0, 1])
         img, mask = self.train_transform(img, mask, p)
 
-        mask = mask.data
         img = img.data
+        mask = mask.data  # (1, D, H, W)
+
         hist = torch.histc(img[mask > 0], bins=16, min=-1, max=1) / mask.sum()
         if torch.sum(hist) == 0 or torch.isnan(hist).any():
             print(index, mask.sum(), "----", hist)
-            print(img[mask > 0])
 
-        sphere = []
-        for c in range(mask.shape[0]):
-            center, radius = self.min_enclosing_sphere(mask[c])
-            sphere_mask = self.create_sphere_mask(mask[c].shape, center, radius)
-            sphere.append(sphere_mask)
 
-        sphere = torch.stack(sphere, dim=0)
+        mask_np = mask[0].cpu().numpy()
 
+        labeled = label(mask_np)
+        props = regionprops(labeled)
+
+        sphere_full = np.zeros_like(mask_np, dtype=bool)
+
+
+        for region in props:
+            region_mask = np.zeros_like(mask_np, dtype=bool)
+            region_mask[tuple(region.coords.T)] = True
+
+            center, radius = self.min_enclosing_sphere(torch.from_numpy(region_mask))
+            sphere_mask = self.create_sphere_mask(mask_np.shape, center, radius)
+
+            sphere_full |= sphere_mask.numpy().astype(bool) 
+
+        sphere = torch.from_numpy(sphere_full.astype(np.uint8)).unsqueeze(0)
         sphere = sphere * 2 - 1
         mask = mask * 2 - 1
 
@@ -101,6 +120,13 @@ class LIDCMASKDataset(Dataset):
         }
 
     @staticmethod
+    def create_sphere_mask(shape, center, radius):
+        Z, X, Y = np.mgrid[:shape[0], :shape[1], :shape[2]]
+        dist_from_center = (Y - center[2])**2 + (X - center[1])**2 + (Z - center[0])**2
+        mask = dist_from_center <= radius**2
+        return torch.tensor(mask, dtype=torch.uint8)
+
+    @staticmethod
     def min_enclosing_sphere(mask):
         indices = torch.nonzero(mask)
         if len(indices) == 0:
@@ -109,17 +135,35 @@ class LIDCMASKDataset(Dataset):
         points = indices.numpy()
         center = points.mean(axis=0)
         radius = np.max(np.linalg.norm(points - center, axis=1))
-
+        
+        
         return center.astype(int), int(radius)
 
-    @staticmethod
-    def create_sphere_mask(shape, center, radius):
 
-        Z, X, Y = np.mgrid[:shape[0], :shape[1], :shape[2]]
+def save_sphere_visualization(sphere_tensor, save_dir="generated_spheres", base_name="sphere"):
 
-        dist_from_center = (Y - center[2])**2 + (X - center[1])**2 + (Z - center[0])**2
-        mask = dist_from_center <= radius**2
-        return torch.tensor(mask, dtype=torch.uint8)
+    os.makedirs(save_dir, exist_ok=True)
+
+
+    if isinstance(sphere_tensor, torch.Tensor):
+        sphere_np = sphere_tensor.squeeze().detach().cpu().numpy()
+    else:
+        sphere_np = sphere_tensor.squeeze()
+
+    nii_path = os.path.join(save_dir, f"{base_name}.nii.gz")
+    nib.save(nib.Nifti1Image(sphere_np.astype(np.uint8), affine=np.eye(4)), nii_path)
+
+
+    z_slice = np.argmax(sphere_np.sum(axis=(1, 2)))
+    plt.imshow(sphere_np[z_slice], cmap="gray", vmin=0, vmax=1)
+    plt.title(f"slice={z_slice}, voxels={int(sphere_np.sum())}")
+    plt.show()
+
+    img_path = os.path.join(save_dir, f"{base_name}_slice.png")
+    plt.savefig(img_path, bbox_inches="tight", dpi=150)
+    plt.close()
+
+    print(f"[Saved] {nii_path} and {img_path} | Voxels={int(sphere_np.sum())}")
 
 
 

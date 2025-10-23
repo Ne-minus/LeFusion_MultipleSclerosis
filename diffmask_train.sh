@@ -1,13 +1,13 @@
 dataset=lidc_mask
-root_dir=data/LIDC/Pathological/Image
-test_txt_dir=data/LIDC/Pathological/test.txt
+root_dir=/workspace/patches/Image
+test_txt_dir=/workspace/patches/test.txt
 diffusion_img_size=64
 diffusion_depth_size=32
 out_dim=1
 unet_num_channels=2
-train_num_steps=80001
-batch_size=20
-results_folder=DiffMask/DiffMask_Model/
+train_num_steps=7001
+batch_size=10
+results_folder=DiffMask/DiffMask_Model_multi/
 
 python DiffMask/train/train.py \
     dataset=$dataset \

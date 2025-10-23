@@ -1,12 +1,12 @@
 name=lidc_mask
-dataset_root_dir=data/LIDC/Pathological/Image
-test_txt_path=data/LIDC/Pathological/test.txt
-gen_mask_path=data/GenMask/LIDC
+dataset_root_dir=/workspace/patches/Image
+test_txt_path=/workspace/patches/test.txt
+gen_mask_path=DiffMask/MsLesSeg/
 diffusion_img_size=64
 diffusion_depth_size=32
 out_dim=1
 unet_num_channels=2
-model_path=DiffMask/DiffMask_Model/diffmask.pt
+model_path=DiffMask/DiffMask_Model/model-6.pt
 
 python DiffMask/inference/inference.py \
     name=$name \

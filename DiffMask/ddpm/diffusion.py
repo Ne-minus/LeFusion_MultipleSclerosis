@@ -1,6 +1,7 @@
 import math
 import copy
 import torch
+import wandb
 from torch import nn, einsum
 import torch.nn.functional as F
 from functools import partial
@@ -654,6 +655,7 @@ class GaussianDiffusion_Nolatent(nn.Module):
         x_recon = self.denoise_fn(**dict(x=x_noisy, time=t, sphere=sphere, cond=cond, **kwargs))
         if self.loss_type == 'l1':
             loss = F.l1_loss(noise, x_recon)
+            loss += 10 * F.l1_loss(noise * (x_start > 0), x_recon * (x_start > 0))
         elif self.loss_type == 'l2':
             loss = F.l1_loss(noise, x_recon)
         else:
@@ -664,6 +666,10 @@ class GaussianDiffusion_Nolatent(nn.Module):
         b, device = x.shape[0], x.device
         t = torch.randint(0, self.num_timesteps, (b,), device=device).long().to(self.device)
         return self.p_losses(**dict(x_start=x, t=t, sphere=sphere, cond=None, *args, **kwargs))
+
+
+def wandb_logger(log, step):
+    wandb.log({"train/loss": log["loss"], "step": step})
 
 class Trainer(object):
     def __init__(
@@ -754,11 +760,12 @@ class Trainer(object):
         self.ema_model.load_state_dict(data['ema'], **kwargs)
         self.scaler.load_state_dict(data['scaler'])
 
+
     def train(
         self,
         prob_focus_present=0.,
         focus_present_mask=None,
-        log_fn=noop
+        log_fn=wandb_logger
     ):
         assert callable(log_fn)
 
@@ -793,7 +800,8 @@ class Trainer(object):
                 with torch.no_grad():
                     milestone = self.step // self.save_and_sample_every
                 self.save(milestone)
-            log_fn(log)
+            if self.step % 50 == 0: 
+                log_fn(log, self.step)
             self.step += 1
         print('training completed')
 
@@ -802,3 +810,6 @@ def _extract_into_tensor(arr, timesteps, broadcast_shape):
     while len(res.shape) < len(broadcast_shape):
         res = res[..., None]
     return res.expand(broadcast_shape)
+
+def wandb_logger(log):
+    wandb.log({"train/loss": log["loss"], "step": step})
