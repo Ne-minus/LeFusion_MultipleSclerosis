@@ -1,9 +1,12 @@
 # Lesion-Focused Diffusion Model for Multiple Sclerosis
 
 <div align="center">
-<a href="https://api.wandb.ai/links/esneminova-skolkovo-institute-of-science-and-technology/afkpee6c">Wandb</a> |
 <a href="https://arxiv.org/pdf/2403.14066">📃 Paper</a> |
-<a href="https://huggingface.co/Kate-03/DiffMask_MultipleSclerosis">🤗 DiffMask weights</a>
+<a href="https://drive.google.com/drive/folders/1MlfR1vdsgshZRKqquCGAPTKZPvvh_xfA?usp=sharing">🗄️ Data</a> |
+<a href="https://huggingface.co/Kate-03/DiffMask_MultipleSclerosis">🤗 DiffMask weights</a> |
+<a href="https://api.wandb.ai/links/esneminova-skolkovo-institute-of-science-and-technology/afkpee6c">📉 Wandb</a> |
+<a href="https://docs.google.com/presentation/d/1ukql-NkFS7AlMUi8DZa-at7wfHUsEcpNik9AGnjhtGs/edit?usp=sharing">🖥️ Presentation </a> |
+<a href="https://github.com/Ne-minus/LeFusion_MultipleSclerosis"> 🤖 Repository </a>
 </div>
 
 
@@ -29,7 +32,13 @@ chmod +x diffmask_inference.sh
 ./diffmask_inference.sh
 ```
 **LeFusion**  
-TBC
+- train:  
+```shell
+chmod +x ms_patches_training_memory_optimized.sh
+./ms_patches_training_memory_optimized.sh
+```
+- inference:
+Example is available at Inpainting.ipynb
 
 ### Objective and Importance:
 The goal of the Lesion-Focused Diffusion Model for Multiple Sclerosis (MS) is to generate realistic MS lesions on healthy MRI scans. This is important because there is limited patient data available, which makes it hard to train models for other MS-related tasks. Generating synthetic lesions helps augment the dataset and improves model performance in MS research and clinical applications.
@@ -47,8 +56,9 @@ We use the following datasets for our solution:
 
 1) The **MsLesSeg** dataset, which contains pathological data from 53 patients. This dataset includes full brain MRI scans and corresponding lesion masks.  
 ![](static/initial_data.png)
+   More elaborate data analysis is available at NeuroProjectResearch.ipynb
 
-2) A **healthy MRI dataset**.
+3) A **healthy MRI dataset**.
 
 Before training the model, we conducted data analysis. We extracted lesions as connected components and calculated the distribution of lesion volume, the number of lesions per patient, and the bounding sphere radius for each lesion.
 
@@ -77,7 +87,7 @@ Here's the DiffMask architecture. It is diffusion model with control sphere as c
 Since authors generate single lesion they use single min_enclosing_sphere. In our case, during the train procedure we contruct separate sphere for each lesion and the combine them to create sphere mask:
 ![](static/sphere_slice.png)
 
-We also modified the loss function in order to concentrate our model on lesion area as following:
+We also modified the loss function in order to concentrate our model on lesion area as following
 ```python
 if self.loss_type == 'l1':
     loss = F.l1_loss(noise, x_recon)
@@ -98,4 +108,20 @@ After the generation and smoothing, for each mask we tune the threshold (for our
 
 
 ### LeFusion
-TBC
+We used 3D-UNet with attention mechanisms architecture. Total number of parameters ~50M, batch_size 4, gradient accumulation 8 batches. To smooth out the model we applied EMA to model weights. Model was trained for 6200 epochs. Beforehand we adjusted the dataset to handle multiple lesions, code is available at LeFusion. Training loss logs are available at ms_patches_memory_optimized_20251023_115759.log.
+
+Inpainting result after 6200 epochs:
+<img width="979" height="344" alt="Screenshot 2025-10-24 at 20 23 59" src="https://github.com/user-attachments/assets/ff8a1e71-bc44-4b14-9f2c-d13337f910bd" />
+
+### Future steps
+1) Advanced ways of generating the patch location
+   - Brain regions specific
+   - Disease strength specific
+
+2) Downstream segmentation model
+   - Generation analysis
+
+
+### Contribution
+Alen Aliev: EDA, inpainting model training  
+Kate Neminova: Lesion extraction, EDA patch-wise, mask model training
