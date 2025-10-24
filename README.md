@@ -112,3 +112,7 @@ We used 3D-UNet with attention mechanisms architecture. Total number of paramete
 
 Inpainting result after 6200 epochs:
 <img width="979" height="344" alt="Screenshot 2025-10-24 at 20 23 59" src="https://github.com/user-attachments/assets/ff8a1e71-bc44-4b14-9f2c-d13337f910bd" />
+
+### Contribution
+Alen Aliev: EDA, inpainting model training
+Kate Neminova: Lesion extraction, EDA patch-wise, mask model training
