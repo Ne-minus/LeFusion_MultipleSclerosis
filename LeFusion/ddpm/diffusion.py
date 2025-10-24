@@ -738,6 +738,8 @@ class GaussianDiffusion_Nolatent(nn.Module):
             mask = (gt_keep_mask == 1).float()
         elif self.data_type == 'emidec':
             mask = ((gt_keep_mask == 3) | (gt_keep_mask == 4)).float()
+        elif self.data_type == 'ms':
+            mask = (gt_keep_mask == 1).float()
         mask = mask.eq(0) 
         alpha_cumprod = _extract_into_tensor(
             self.alphas_cumprod, t, x.shape)
@@ -852,6 +854,47 @@ class GaussianDiffusion_Nolatent(nn.Module):
                 loss = F.mse_loss(noise_1, x_recon1) + F.mse_loss(noise_2, x_recon2)
             else:
                 raise NotImplementedError()
+        elif self.data_type == 'ms':
+            # Handle MS data - check if it's multi-channel or single-channel
+            if noise.size(1) > 1:
+                # Multi-channel MS data (from MSDataset with lesion types)
+                num_lesion_types = noise.size(1)
+                lesion_masks = []
+                noise_splits = []
+                x_recon_splits = []
+                
+                # Split noise and reconstruction into lesion type channels
+                noise_splits = torch.split(noise, noise.size(1) // num_lesion_types, dim=1)
+                x_recon_splits = torch.split(x_recon, x_recon.size(1) // num_lesion_types, dim=1)
+                
+                # Create masks for each lesion type
+                for i in range(num_lesion_types):
+                    lesion_masks.append((mask == (i + 1)).float())
+                
+                # Calculate loss for each lesion type
+                loss = 0
+                for i in range(num_lesion_types):
+                    noise_i = noise_splits[i] * lesion_masks[i]
+                    x_recon_i = x_recon_splits[i] * lesion_masks[i]
+                    
+                    if self.loss_type == 'l1':
+                        loss += F.l1_loss(noise_i, x_recon_i)
+                    elif self.loss_type == 'l2':
+                        loss += F.mse_loss(noise_i, x_recon_i)
+                    else:
+                        raise NotImplementedError()
+            else:
+                # Single-channel MS data (from MSPatchesDataset)
+                # Apply mask to both noise and reconstruction
+                noise = noise * mask
+                x_recon = x_recon * mask
+                
+                if self.loss_type == 'l1':
+                    loss = F.l1_loss(noise, x_recon)
+                elif self.loss_type == 'l2':
+                    loss = F.mse_loss(noise, x_recon)
+                else:
+                    raise NotImplementedError()
         return loss
 
     def forward(self, x, mask, *args, **kwargs):

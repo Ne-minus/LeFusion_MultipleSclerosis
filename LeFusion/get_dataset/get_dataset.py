@@ -1,6 +1,8 @@
 from torch.utils.data import DataLoader
 from dataset import LIDCDataset, LIDCInDataset
 from dataset import EMIDECDataset, EMIDECInDataset
+from dataset import MSDataset, MSOriginalDataset, MSPatchesDataset
+from dataset.ms_patches_test import MSPatchesTestDataset
 
 
 def get_inference_dataloader(dataset_root_dir, test_txt_dir,batch_size=1, drop_last=False, data_type=''):
@@ -22,6 +24,9 @@ def get_train_dataset(cfg):
         sampler = None
     elif cfg.dataset.data_type == 'emidec':
         train_dataset = EMIDECDataset(root_dir=cfg.dataset.root_dir)
+        sampler = None
+    elif cfg.dataset.data_type == 'ms':
+        train_dataset = MSPatchesDataset(root_dir=cfg.dataset.root_dir, test_txt_dir=cfg.dataset.test_txt_dir)
         sampler = None
     return train_dataset, sampler
 

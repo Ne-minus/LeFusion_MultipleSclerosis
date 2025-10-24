@@ -14,7 +14,7 @@ import torch.nn as nn
 def run(cfg: DictConfig):
     torch.cuda.set_device(cfg.model.gpus)
     data_type = cfg.dataset.data_type.lower()
-    if data_type not in ['lidc', 'emidec']:
+    if data_type not in ['lidc', 'emidec', 'ms']:
         raise ValueError("Wrong data type")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
