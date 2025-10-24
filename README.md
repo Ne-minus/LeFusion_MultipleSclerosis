@@ -1,9 +1,12 @@
 # Lesion-Focused Diffusion Model for Multiple Sclerosis
 
 <div align="center">
-<a href="https://api.wandb.ai/links/esneminova-skolkovo-institute-of-science-and-technology/afkpee6c">Wandb</a> |
 <a href="https://arxiv.org/pdf/2403.14066">📃 Paper</a> |
-<a href="https://huggingface.co/Kate-03/DiffMask_MultipleSclerosis">🤗 DiffMask weights</a>
+<a href="https://drive.google.com/drive/folders/1MlfR1vdsgshZRKqquCGAPTKZPvvh_xfA?usp=sharing">🗄️ Data</a> |
+<a href="https://huggingface.co/Kate-03/DiffMask_MultipleSclerosis">🤗 DiffMask weights</a> |
+<a href="https://api.wandb.ai/links/esneminova-skolkovo-institute-of-science-and-technology/afkpee6c">📉 Wandb</a> |
+<a href="https://docs.google.com/presentation/d/1ukql-NkFS7AlMUi8DZa-at7wfHUsEcpNik9AGnjhtGs/edit?usp=sharing">🖥️ Presentation </a> |
+<a href="https://github.com/Ne-minus/LeFusion_MultipleSclerosis"> 🤖 Repository </a>
 </div>
 
 
