@@ -47,8 +47,9 @@ We use the following datasets for our solution:
 
 1) The **MsLesSeg** dataset, which contains pathological data from 53 patients. This dataset includes full brain MRI scans and corresponding lesion masks.  
 ![](static/initial_data.png)
+   More elaborate data analysis is available at NeuroProjectResearch.ipynb
 
-2) A **healthy MRI dataset**.
+3) A **healthy MRI dataset**.
 
 Before training the model, we conducted data analysis. We extracted lesions as connected components and calculated the distribution of lesion volume, the number of lesions per patient, and the bounding sphere radius for each lesion.
 
