@@ -3,7 +3,7 @@
 <div align="center">
 <a href="https://api.wandb.ai/links/esneminova-skolkovo-institute-of-science-and-technology/afkpee6c">Wandb</a> |
 <a href="https://arxiv.org/pdf/2403.14066">📃 Paper</a> |
-<a href="https://huggingface.co/papers/2504.09130">🤗 DiffMask weights</a>
+<a href="https://huggingface.co/Kate-03/DiffMask_MultipleSclerosis">🤗 DiffMask weights</a>
 </div>
 
 
