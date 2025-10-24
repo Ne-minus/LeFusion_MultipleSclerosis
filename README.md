@@ -1,10 +1,11 @@
 # Lesion-Focused Diffusion Model for Multiple Sclerosis
 
-<p align="center">
-[Wandb](https://api.wandb.ai/links/esneminova-skolkovo-institute-of-science-and-technology/afkpee6c) |
-[📃 Paper](https://arxiv.org/pdf/2403.14066) |
-[🤗 DiffMask weights](https://huggingface.co/papers/2504.09130)
-</p>
+<div align="center">
+<a href="https://api.wandb.ai/links/esneminova-skolkovo-institute-of-science-and-technology/afkpee6c">Wandb</a> |
+<a href="https://arxiv.org/pdf/2403.14066">📃 Paper</a> |
+<a href="https://huggingface.co/papers/2504.09130">🤗 DiffMask weights</a>
+</div>
+
 
 
 To run the project ensure that ypu have the following dataset structure:
