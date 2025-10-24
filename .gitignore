@@ -5,4 +5,4 @@ DiffMask/DiffMask_Model_multi/
 outputs/
 __pycache__/
 viz_spheres/
-threshold_results_granular_custom_spheres_new_model/
+threshold_results_granular_custom_spheres_new_model/LeFusion/LeFusion_Model/MS_Patches_MemoryOptimized/model-61.pt
