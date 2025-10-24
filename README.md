@@ -64,7 +64,7 @@ Before training the model, we conducted data analysis. We extracted lesions as c
 
 ### DiffMask pipeline and trainig
 Here's the DiffMask architecture. It is diffusion model with control sphere as condition.
-![](static/diffmask_pipeline.png)
+![](LeFusion_MultipleSclerosis/static/diffmask_pipeline.png)
 
 Since authors generate single lesion they use single min_enclosing_sphere. In our case, during the train procedure we contruct separate sphere for each lesion and the combine them to create sphere mask:
 ![](static/sphere_slice.png)
