@@ -87,7 +87,7 @@ Here's the DiffMask architecture. It is diffusion model with control sphere as c
 Since authors generate single lesion they use single min_enclosing_sphere. In our case, during the train procedure we contruct separate sphere for each lesion and the combine them to create sphere mask:
 ![](static/sphere_slice.png)
 
-We also modified the loss function in order to concentrate our model on lesion area as following:
+We also modified the loss function in order to concentrate our model on lesion area as following
 ```python
 if self.loss_type == 'l1':
     loss = F.l1_loss(noise, x_recon)
@@ -113,6 +113,15 @@ We used 3D-UNet with attention mechanisms architecture. Total number of paramete
 Inpainting result after 6200 epochs:
 <img width="979" height="344" alt="Screenshot 2025-10-24 at 20 23 59" src="https://github.com/user-attachments/assets/ff8a1e71-bc44-4b14-9f2c-d13337f910bd" />
 
+### Future steps
+1) Advanced ways of generating the patch location
+   - Brain regions specific
+   - Disease strength specific
+
+2) Downstream segmentation model
+   - Generation analysis
+
+
 ### Contribution
-Alen Aliev: EDA, inpainting model training
+Alen Aliev: EDA, inpainting model training  
 Kate Neminova: Lesion extraction, EDA patch-wise, mask model training
