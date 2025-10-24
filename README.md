@@ -53,7 +53,7 @@ Before training the model, we conducted data analysis. We extracted lesions as c
    Each patch has a shape of (32, 64, 64). We ensured that no lesions intersect with the patch boundary. In cases where an intersection occurred, the lesion in question was zeroed out.
    Here's some exaples of masks that we crpped:  
 
-| ![](static/initial_mask3.png) | ![](static/initial_mask2.png) |
+| ![](LeFusion_MultipleSclerosis/static/initial_mask3.png) | ![](LeFusion_MultipleSclerosis/static/initial_mask2.png) |
 |----------|----------|
 
 2) **Crop patches from the original MRI scans**:  useful for consequent LeFusion training
