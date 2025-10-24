@@ -29,7 +29,13 @@ chmod +x diffmask_inference.sh
 ./diffmask_inference.sh
 ```
 **LeFusion**  
-TBC
+- train:  
+```shell
+chmod +x ms_patches_training_memory_optimized.sh
+./ms_patches_training_memory_optimized.sh
+```
+- inference:
+Example is available at Inpainting.ipynb
 
 ### Objective and Importance:
 The goal of the Lesion-Focused Diffusion Model for Multiple Sclerosis (MS) is to generate realistic MS lesions on healthy MRI scans. This is important because there is limited patient data available, which makes it hard to train models for other MS-related tasks. Generating synthetic lesions helps augment the dataset and improves model performance in MS research and clinical applications.
@@ -99,4 +105,7 @@ After the generation and smoothing, for each mask we tune the threshold (for our
 
 
 ### LeFusion
-TBC
+We used 3D-UNet with attention mechanisms architecture. Total number of parameters ~50M, batch_size 4, gradient accumulation 8 batches. To smooth out the model we applied EMA to model weights. Model was trained for 6200 epochs. Beforehand we adjusted the dataset to handle multiple lesions, code is available at LeFusion. Training loss logs are available at ms_patches_memory_optimized_20251023_115759.log.
+
+Inpainting result after 6200 epochs:
+<img width="979" height="344" alt="Screenshot 2025-10-24 at 20 23 59" src="https://github.com/user-attachments/assets/ff8a1e71-bc44-4b14-9f2c-d13337f910bd" />
